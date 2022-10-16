@@ -6,4 +6,4 @@ import java.nio.file.Files
 internal fun Resource.countLines(): Long =
 	Files.lines(file.toPath()).use {
 		it.count()
-}
+	}
