@@ -1,14 +1,14 @@
 package com.github.lorenzomilicia.resourcepartitioninglib.utils
 
 internal fun divideIntoBins(
-	start: Long,
-	end: Long,
-	binSize: Long?,
-): List<LongRange> {
+	start: Int,
+	end: Int,
+	binSize: Int?,
+): List<IntRange> {
 	if (start < 0 || end < 0) throw IllegalArgumentException("Number should be positive")
 	if (end < start) throw IllegalArgumentException("End cannot be lesser than start")
 	if (binSize == null) return listOf(start..end)
-	val ranges = mutableListOf<LongRange>()
+	val ranges = mutableListOf<IntRange>()
 	var iterator = start
 	do {
 		val isLast = iterator + binSize >= end

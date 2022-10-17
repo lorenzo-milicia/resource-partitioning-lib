@@ -43,17 +43,17 @@ internal class MyMultiResourcePartitionerTest {
 		val context2 = assertNotNull(partitions["partition1"])
 		val context3 = assertNotNull(partitions["partition2"])
 
-		assertEquals(resources[0].file.path, context1.getString("fileName"))
-		assertEquals(resources[0].file.path, context2.getString("fileName"))
-		assertEquals(resources[1].file.path, context3.getString("fileName"))
+		assertEquals(resources[0].url.toExternalForm(), context1.getString("fileName"))
+		assertEquals(resources[0].url.toExternalForm(), context2.getString("fileName"))
+		assertEquals(resources[1].url.toExternalForm(), context3.getString("fileName"))
 
 
-		assertEquals(0, context1.getLong("startingLine"))
-		assertEquals(5, context2.getLong("startingLine"))
-		assertEquals(0, context3.getLong("startingLine"))
+		assertEquals(0, context1.getInt("startingLine"))
+		assertEquals(5, context2.getInt("startingLine"))
+		assertEquals(0, context3.getInt("startingLine"))
 
-		assertEquals(4, context1.getLong("finishingLine"))
-		assertEquals(8, context2.getLong("finishingLine"))
-		assertEquals(5, context3.getLong("finishingLine"))
+		assertEquals(4, context1.getInt("finishingLine"))
+		assertEquals(8, context2.getInt("finishingLine"))
+		assertEquals(5, context3.getInt("finishingLine"))
 	}
 }
