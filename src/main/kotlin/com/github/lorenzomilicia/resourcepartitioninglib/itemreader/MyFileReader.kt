@@ -13,9 +13,9 @@ open class MyFileReader<T>: FlatFileItemReader<T>(), StepExecutionListener {
 	private var finishingCount by Delegates.notNull<Int>()
 
 	override fun doOpen() {
-		currentItemCount = startingCount
-		setMaxItemCount(finishingCount)
 		super.doOpen()
+		currentItemCount = startingCount
+		setMaxItemCount(finishingCount + 1)
 	}
 
 	override fun beforeStep(stepExecution: StepExecution) {
