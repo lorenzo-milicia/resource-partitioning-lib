@@ -15,7 +15,7 @@ import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
 
 @ExtendWith(MockKExtension::class)
-internal class MyMultiResourcePartitionerTest {
+internal class MultiResourceChunkedPartitionerTest {
 
 	@field:TempDir
 	lateinit var tempFolder: File
@@ -31,7 +31,7 @@ internal class MyMultiResourcePartitionerTest {
 			FileSystemResource(File(tempFolder, "firstfile.txt").also { it.createNewFile() }),
 			FileSystemResource(File(tempFolder, "second.txt").also { it.createNewFile() }),
 		)
-		val partitioner = MyMultiResourcePartitioner(resources)
+		val partitioner = MultiResourceChunkedPartitioner(resources)
 		partitioner.partitionSize = 5
 
 		every { resources[0].countLines() } returns 8

@@ -6,7 +6,7 @@ import org.springframework.batch.core.partition.support.Partitioner
 import org.springframework.batch.item.ExecutionContext
 import org.springframework.core.io.Resource
 
-open class MyMultiResourcePartitioner(
+open class MultiResourceChunkedPartitioner(
 	private val resources: List<Resource>,
 ): Partitioner {
 
