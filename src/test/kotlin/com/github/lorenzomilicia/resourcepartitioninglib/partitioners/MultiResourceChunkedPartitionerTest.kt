@@ -48,12 +48,12 @@ internal class MultiResourceChunkedPartitionerTest {
 		assertEquals(resources[1].url.toExternalForm(), context3.getString("fileName"))
 
 
-		assertEquals(0, context1.getInt("startingLine"))
-		assertEquals(5, context2.getInt("startingLine"))
-		assertEquals(0, context3.getInt("startingLine"))
+		assertEquals(0, context1.getInt("startingLineIndex"))
+		assertEquals(5, context2.getInt("startingLineIndex"))
+		assertEquals(0, context3.getInt("startingLineIndex"))
 
-		assertEquals(4, context1.getInt("finishingLine"))
-		assertEquals(8, context2.getInt("finishingLine"))
-		assertEquals(5, context3.getInt("finishingLine"))
+		assertEquals(4, context1.getInt("endingLineIndex"))
+		assertEquals(7, context2.getInt("endingLineIndex"))
+		assertEquals(4, context3.getInt("endingLineIndex"))
 	}
 }

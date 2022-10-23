@@ -12,7 +12,7 @@ open class MultiResourceChunkedPartitioner(
 
 	var filekeyName: String = FILE_KEY_NAME
 	var startingLinekeyName: String = STARTING_LINE
-	var finishingLinekeyName: String = FINISHING_LINE
+	var endingLinekeyName: String = FINISHING_LINE
 
 	var partitionSize: Int? = null
 
@@ -20,13 +20,15 @@ open class MultiResourceChunkedPartitioner(
 
 	override fun partition(gridSize: Int): MutableMap<String, ExecutionContext> =
 		resources
-			.map { it to divideIntoBins(linesToSkip, it.countLines(), partitionSize) }
-			.flatMap { (file, ranges) -> ranges.map { file to it } }
+			.associateWith { it.countLines() }
+			.filterValues { it > 0 }
+			.map { (resource, lines) -> resource to divideIntoBins(linesToSkip, lines - 1, partitionSize) }
+			.flatMap { (resource, ranges) -> ranges.map { resource to it } }
 			.mapIndexed { index, (resource, range) ->
 				val executionContext = ExecutionContext()
 				executionContext.put(filekeyName, resource.url.toExternalForm())
 				executionContext.put(startingLinekeyName, range.first)
-				executionContext.put(finishingLinekeyName, range.last)
+				executionContext.put(endingLinekeyName, range.last)
 				"$PARTITION_KEY$index" to executionContext
 			}
 			.toMap()
@@ -40,8 +42,8 @@ open class MultiResourceChunkedPartitioner(
 
 		private const val PARTITION_KEY = "partition"
 		private const val FILE_KEY_NAME = "fileName"
-		private const val STARTING_LINE = "startingLine"
-		private const val FINISHING_LINE = "finishingLine"
+		private const val STARTING_LINE = "startingLineIndex"
+		private const val FINISHING_LINE = "endingLineIndex"
 	}
 
 }

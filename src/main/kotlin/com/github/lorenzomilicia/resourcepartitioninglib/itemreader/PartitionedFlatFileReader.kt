@@ -9,9 +9,9 @@ open class PartitionedFlatFileReader<T>: FlatFileItemReader<T>() {
 	private var endingLineIndex: Int? = null
 
 	override fun doOpen() {
-		super.doOpen()
 		startingLineIndex?.let { currentItemCount = it }
-		endingLineIndex?.let { setMaxItemCount(it) }
+		endingLineIndex?.let { setMaxItemCount(it + 1) }
+		super.doOpen()
 	}
 
 	fun setLinesToRead(startingLineIndex: Int, endingLineIndex: Int) {
