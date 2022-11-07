@@ -22,6 +22,8 @@ use the standard `MultiResourcePartitioner`.
 
 The configuration of the partitioner should look something like this:
 
+### Kotlin
+
 ```kotlin
 fun partitioner(resources: List<Resource>): MultiResourceChunkedPartitioner {
 	val partitioner = MultiResourceChunkedPartitioner(resources)
@@ -31,6 +33,23 @@ fun partitioner(resources: List<Resource>): MultiResourceChunkedPartitioner {
 	return partitioner
 }
 ```
+###
+
+### Java
+```java
+public class PartitioningStep   {
+    
+    MultiResourceChunkedPartitioner partitioner(ArrayList<Resource> resources) {
+        MultiResourceChunkedPartitioner partitioner = new MultiResourceChunkedPartitioner(resources);
+    
+        partitioner.setLinesToSkip(1);   // Set in the partitioner instead of the ItemReader
+        partitioner.setPartitionSize(10_000);  // Sets the number of lines to process in each partition
+    
+        return partitioner;
+    }
+}
+```
+###
 
 The `MultiResourceChunkedPartitioner` adds three key-value pairs to each `ExecutionContext`:
 - `fileName` -  Same as the `MultiResourcePartitioner`
@@ -40,23 +59,62 @@ The `MultiResourceChunkedPartitioner` adds three key-value pairs to each `Execut
 If the `partitionSize` is not set, then the `MultiResourceChunkedPartitioner` will create one partition per file, behaving in the same way as the `MultiResourcePartitioner`.
 
 The `PartitionedFlatFileReader` is designed to integrate easily with the `MultiResourceChunkedPartitioner`. The configuration of the reader should look something like this:
+
+### Kotlin
+
 ```kotlin
 @Bean
 @StepScope
-fun reader(
+fun <T> reader(
     @Value("#{stepExecutionContext[fileName]}") pathToFile: String,
     @Value("#{stepExecutionContext[startingLineIndex]}") startingLineIndex: Int,
     @Value("#{stepExecutionContext[endingLineIndex]}") endingLineIndex: Int,
-): PartitionedFlatFileReader<Any> {
-    val reader = PartitionedFlatFileReader<String>()
+): PartitionedFlatFileReader<T> {
+    val reader = PartitionedFlatFileReader<T>()
+    
     reader.setResource(FileSystemResource(pathToFile.substringAfter("file:/")))
     reader.setLinesToRead(startingLineIndex, endingLineIndex)
     reader.setLineMapper { it, idx ->
         // Line mapping
-        [...]
     }
+    
     return reader
 }
 ```
+###
 
-WIP
+### Java
+
+```java
+public class PartitioningStep {
+
+    @Bean
+    @StepScope
+    PartitionedFlatFileReader<T> itemReader(
+            @Value("#{stepExecutionContext[fileName]}") String pathToFile,
+            @Value("#{stepExecutionContext[startingLineIndex]}") int startingLineIndex,
+            @Value("#{stepExecutionContext[endingLineIndex]}") int endingLineIndex
+    ) {
+        PartitionedFlatFileReader<T> reader = new PartitionedFlatFileReader<T>();
+
+        reader.setResource(new FileSystemResource(pathToFile.substring(pathToFile.lastIndexOf("file:/") + 1)));
+        reader.setLinesToRead(startingLineIndex, endingLineIndex);
+        reader.setLineMapper(
+                (row, idx) -> {
+                    // Line mapping
+                }
+        );
+
+        return reader;
+    }
+}
+```
+###
+
+The `PartitionedFlatFileReader` behaves very much in the same way as the `FlatFileItemReader`, with the noticeable differences being
+the method `setLinesToRead` which should take as parameters the values that the partitioner added to the `ExecutionContext`, and the fact that
+the method `setLinesToSkip` is deprecated, since the lines to skip should be set at the partitioner level, to avoid skipping the lines for all the partitions
+of the same file, and not just for the first partition.
+
+## Notes
+In case of conflicts, the default key names for *filekeyName*, *startingLinekeyName* and *endingLinekeyName* can be overridden.
